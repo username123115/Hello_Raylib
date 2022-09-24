@@ -1,32 +1,34 @@
 #include "raylib.h"
 
-#define SCREEN_WIDTH (800)
-#define SCREEN_HEIGHT (450)
-
-#define WINDOW_TITLE "Window title"
+#define WINDOW_TITLE "ERMAHGAWD ITS A GAME"
+const int screenWidth = 800;
+const int screenHeight = 450;
 
 int main(void)
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    InitWindow(screenWidth, screenHeight, WINDOW_TITLE);
     SetTargetFPS(60);
-
-    Texture2D texture = LoadTexture(ASSETS_PATH"test.png"); // Check README.md for how this works
+    Vector2 pos = {screenWidth / 2, screenHeight / 2};
 
     while (!WindowShouldClose())
     {
+        //Update
+        //------------------------------------------------------------------------------------------------------------------
+        if (IsKeyDown(KEY_RIGHT)) pos.x += 2.0f;
+        if (IsKeyDown(KEY_LEFT)) pos.x -= 2.0f;
+        if (IsKeyDown(KEY_UP)) pos.y -= 2.0f;
+        if (IsKeyDown(KEY_DOWN)) pos.y += 2.0f;
+
+        //------------------------------------------------------------------------------------------------------------------
+
+        //Draw
+        //------------------------------------------------------------------------------------------------------------------
         BeginDrawing();
-
         ClearBackground(RAYWHITE);
-
-        const int texture_x = SCREEN_WIDTH / 2 - texture.width / 2;
-        const int texture_y = SCREEN_HEIGHT / 2 - texture.height / 2;
-        DrawTexture(texture, texture_x, texture_y, WHITE);
-
-        const char* text = "OMG! IT WORKS!";
-        const Vector2 text_size = MeasureTextEx(GetFontDefault(), text, 20, 1);
-        DrawText(text, SCREEN_WIDTH / 2 - text_size.x / 2, texture_y + texture.height + text_size.y + 10, 20, BLACK);
+        DrawCircleV(pos, 10, SKYBLUE);
 
         EndDrawing();
+        //------------------------------------------------------------------------------------------------------------------
     }
 
     CloseWindow();
