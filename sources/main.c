@@ -62,15 +62,14 @@ int main(void)
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) player.position.x += player.speed.x;
         else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) player.position.x -= player.speed.x;
         if (IsKeyPressed(KEY_SPACE)) {
-            BulletNode *OldFirst = FirstBullet;
-            FirstBullet = malloc(sizeof(BulletNode));
-            FirstBullet->next = OldFirst;
-            FirstBullet->bullet.position = player.position;
-            //center bullet onto player
-            FirstBullet->bullet.size = (Vector2) {5, 10};
-            FirstBullet->bullet.speed = (Vector2) {0, -5};
-            FirstBullet->bullet.active = true;
-            FirstBullet->bullet.position.x += (player.size.x - FirstBullet->bullet.size.x) / 2;
+            for (int i = 0; i < 2; i++)
+            {
+                BulletNode *OldFirst = FirstBullet;
+                FirstBullet = malloc(sizeof(BulletNode));
+                FirstBullet->next = OldFirst;
+                FirstBullet->bullet = (Bullet) {player.position, (Vector2) {8, 16}, (Vector2) {0, -5}, true};
+                FirstBullet->bullet.position.x += (player.size.x * i - FirstBullet->bullet.size.x / 2);
+            }
 
         }
         if (IsKeyPressed(KEY_C)) {
@@ -105,12 +104,11 @@ int main(void)
                 {
                     if (Asteroids[i].active)
                     {
-                        // Rectangle bullet_info = {tmp->bullet.size.y, tmp->bullet.size.x, tmp->bullet.position.x, tmp->bullet.position.y};
                         Rectangle bullet_info = {tmp->bullet.position.x, tmp->bullet.position.y, tmp->bullet.size.x, tmp->bullet.size.y};
                         bool hit = CheckCollisionCircleRec(Asteroids[i].position, Asteroids[i].radius, bullet_info);
                         if (hit)
                         {
-                            // tmp->bullet.active = false;
+                            tmp->bullet.active = false;
                             Asteroids[i].active = false;
                         }
                     }
@@ -139,28 +137,29 @@ int main(void)
 
         next = FirstBullet;
         prev = FirstBullet;
-        bool firstnode = true;
+        bool IncrementPrev = true;
         while (next) 
         {
             BulletNode *tmp = next;
             next = tmp-> next;
-            if (tmp->bullet.active == false) {
-                if (firstnode)
+            IncrementPrev = !(tmp == FirstBullet);
+
+            if (!tmp->bullet.active)
+            {
+                if (tmp == FirstBullet)
                 {
                     FirstBullet = next;
+                    prev = next;
                     free(tmp);
                 }
-                if (!firstnode)
+                else if (tmp != FirstBullet)
                 {
-                    remove_middle_node(tmp, prev);
+                    prev->next = tmp->next;
+                    free(tmp);
+                    IncrementPrev = false;
                 }
-                
             }
-            if (!firstnode)
-            {
-                prev = prev->next;
-            }
-            firstnode = false;
+            if (IncrementPrev) prev = prev->next;
         }
 
         //------------------------------------------------------------------------------------------------------------------
